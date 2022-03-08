@@ -3,16 +3,6 @@ import ProTable from '@ant-design/pro-table';
 import UpdateForm from './components/UpdateForm';
 import { list9 } from '@/services/ant-design-pro/blog';
 
-export type TableListItem = {
-  key: number;
-  name: string;
-  containers: number;
-  creator: string;
-  status: string;
-  createdAt: number;
-  memo: string;
-};
-
 const columns: ProColumns<API.InyaaBlog>[] = [
   {
     title: '标题',
@@ -51,8 +41,8 @@ const columns: ProColumns<API.InyaaBlog>[] = [
     key: 'option',
     valueType: 'option',
     render: (text, record) => [
-      <UpdateForm id={record.id} type={1} key="edit" />,
-      <a key="link">删除</a>,
+      <UpdateForm id={record.id} type={1} key="edit" authCode="1002" />,
+      <a key="delete">删除</a>,
     ],
   },
 ];
@@ -71,7 +61,7 @@ export default () => {
           total: blogList.data?.totalElements,
         });
       }}
-      rowKey="key"
+      rowKey="id"
       pagination={{
         showQuickJumper: true,
         defaultPageSize: 10,
@@ -82,7 +72,7 @@ export default () => {
       }}
       dateFormatter="string"
       headerTitle="文章列表"
-      toolBarRender={() => [<UpdateForm type={0} key={0} />]}
+      toolBarRender={() => [<UpdateForm type={0} key="create" authCode="1001" />]}
     />
   );
 };

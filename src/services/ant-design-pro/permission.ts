@@ -67,8 +67,8 @@ export async function findMenuList(options?: { [key: string]: any }) {
 }
 
 /** 此处后端没有提供注释 GET /permission/findButtonList */
-export async function findButtonList(options?: { [key: string]: any }) {
-  return request<API.BaseResultListString>('/permission/findButtonList', {
+export async function findKeyList(options?: { [key: string]: any }) {
+  return request<API.BaseResultListString>('/permission/findKeyList', {
     method: 'GET',
     ...(options || {}),
   });

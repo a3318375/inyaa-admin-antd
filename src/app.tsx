@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { SettingDrawer } from '@ant-design/pro-layout';
 import { PageLoading } from '@ant-design/pro-layout';
@@ -7,7 +8,7 @@ import { notification } from 'antd';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { info as queryCurrentUser } from './services/ant-design-pro/user';
-import { findMenuList } from './services/ant-design-pro/permission';
+import { findMenuList, findKeyList } from './services/ant-design-pro/permission';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
 import type { RequestOptionsInit, ResponseError } from 'umi-request';
@@ -25,6 +26,7 @@ export const initialStateConfig = {
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
+  keyList?: string[];
   currentUser?: API.InyaaSysUser;
   loading?: boolean;
   fetchUserInfo?: () => Promise<API.InyaaSysUser | undefined>;
@@ -38,11 +40,17 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
+  const fetchKeyList = async () => {
+    const msg = await findKeyList();
+    return msg.data;
+  };
   // 如果是登录页面，不执行
   if (history.location.pathname !== loginPath) {
     const currentUser = await fetchUserInfo();
+    const keyList = await fetchKeyList();
     return {
       fetchUserInfo,
+      keyList,
       currentUser,
       settings: defaultSettings,
     };
@@ -70,6 +78,9 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       }
     },
     menu: {
+      params: {
+        userId: initialState?.currentUser?.id,
+      },
       request: async () => {
         const menuData = await findMenuList();
         return menuData.data;
