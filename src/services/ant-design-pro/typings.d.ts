@@ -182,26 +182,16 @@ declare namespace API {
     data?: InyaaSysPermission[];
   };
 
-  type BaseResultListInyaaSysPermissionVo = {
+  type BaseResultListInyaaAdminMenuVo = {
     code?: number;
     message?: string;
-    data?: InyaaSysPermissionVo[];
+    data?: InyaaAdminMenuVo[];
   };
 
-  type InyaaSysPermissionVo = {
-    id?: number;
+  type InyaaAdminMenuVo = {
     title?: string;
-    name?: string;
-    path?: string;
-    icon?: string;
-    component?: string;
-    isShow?: boolean;
-    type?: number;
-    parentId?: number;
-    isExt?: boolean;
-    sort?: number;
-    createTime?: string;
-    updateTime?: string;
+    value?: number;
+    children?: InyaaAdminMenuVo[];
   };
 
   type BaseResultListMapStringObject = {
@@ -373,10 +363,6 @@ declare namespace API {
 
   type list4Params = {
     permission: InyaaSysPermission;
-  };
-
-  type findPermissionListParams = {
-    enable: boolean;
   };
 
   type list5Params = {

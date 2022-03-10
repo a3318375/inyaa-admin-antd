@@ -29,7 +29,7 @@ export async function delete7(body: API.InyaaSysDept, options?: { [key: string]:
 /** 此处后端没有提供注释 GET /dept/list */
 export async function list7(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.list7Params,
+  params?: API.list7Params,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResultListInyaaSysDeptDto>('/dept/list', {

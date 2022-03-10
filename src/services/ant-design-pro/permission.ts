@@ -43,17 +43,13 @@ export async function list4(
   });
 }
 
-/** 此处后端没有提供注释 GET /permission/findPermissionList */
-export async function findPermissionList(
+/** 此处后端没有提供注释 GET /permission/findTreeList */
+export async function findTreeList(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.findPermissionListParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResultListInyaaSysPermissionVo>('/permission/findPermissionList', {
+  return request<API.BaseResultListInyaaAdminMenuVo>('/permission/findTreeList', {
     method: 'GET',
-    params: {
-      ...params,
-    },
     ...(options || {}),
   });
 }

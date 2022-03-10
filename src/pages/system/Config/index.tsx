@@ -1,190 +1,111 @@
-import React from 'react';
-import { Button, Tooltip, Tag } from 'antd';
-import { DownOutlined, QuestionCircleOutlined, EllipsisOutlined } from '@ant-design/icons';
-import type { ProColumns } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
+import React, { useState, useRef, useLayoutEffect } from 'react';
+import { GridContent } from '@ant-design/pro-layout';
+import { Menu } from 'antd';
+import BaseView from './components/base';
+import BindingView from './components/binding';
+import NotificationView from './components/notification';
+import SecurityView from './components/security';
+import styles from './style.less';
 
-export type Status = {
-  color: string;
-  text: string;
+const { Item } = Menu;
+
+type ConfigStateKeys = 'base' | 'security' | 'binding' | 'notification';
+type ConfigState = {
+  mode: 'inline' | 'horizontal';
+  selectKey: ConfigStateKeys;
 };
 
-const statusMap = {
-  0: {
-    color: 'blue',
-    text: '进行中',
-  },
-  1: {
-    color: 'green',
-    text: '已完成',
-  },
-  2: {
-    color: 'volcano',
-    text: '警告',
-  },
-  3: {
-    color: 'red',
-    text: '失败',
-  },
-  4: {
-    color: '',
-    text: '未完成',
-  },
-};
+const Config: React.FC = () => {
+  const menuMap: Record<string, React.ReactNode> = {
+    base: '基本设置',
+    security: '安全设置',
+    binding: '账号绑定',
+    notification: '新消息通知',
+  };
 
-export type TableListItem = {
-  key: number;
-  name: string;
-  containers: number;
-  creator: string;
-  status: Status;
-  createdAt: number;
-};
-const tableListDataSource: TableListItem[] = [];
-
-const creators = ['付小小', '曲丽丽', '林东东', '陈帅帅', '兼某某'];
-
-for (let i = 0; i < 5; i += 1) {
-  tableListDataSource.push({
-    key: i,
-    name: 'AppName',
-    containers: Math.floor(Math.random() * 20),
-    creator: creators[Math.floor(Math.random() * creators.length)],
-    status: statusMap[Math.floor(Math.random() * 10) % 5],
-    createdAt: Date.now() - Math.floor(Math.random() * 100000),
+  const [initConfig, setInitConfig] = useState<ConfigState>({
+    mode: 'inline',
+    selectKey: 'base',
   });
-}
+  const dom = useRef<HTMLDivElement>();
 
-const columns: ProColumns<TableListItem>[] = [
-  {
-    title: '应用名称',
-    width: 120,
-    dataIndex: 'name',
-    render: (_) => <a>{_}</a>,
-  },
-  {
-    title: '状态',
-    width: 120,
-    dataIndex: 'status',
-    render: (_, record) => <Tag color={record.status.color}>{record.status.text}</Tag>,
-  },
-  {
-    title: '容器数量',
-    width: 120,
-    dataIndex: 'containers',
-    align: 'right',
-    sorter: (a, b) => a.containers - b.containers,
-  },
-
-  {
-    title: '创建者',
-    width: 120,
-    dataIndex: 'creator',
-    valueEnum: {
-      all: { text: '全部' },
-      付小小: { text: '付小小' },
-      曲丽丽: { text: '曲丽丽' },
-      林东东: { text: '林东东' },
-      陈帅帅: { text: '陈帅帅' },
-      兼某某: { text: '兼某某' },
-    },
-  },
-  {
-    title: (
-      <>
-        创建时间
-        <Tooltip placement="top" title="这是一段描述">
-          <QuestionCircleOutlined style={{ marginLeft: 4 }} />
-        </Tooltip>
-      </>
-    ),
-    width: 140,
-    key: 'since',
-    dataIndex: 'createdAt',
-    valueType: 'date',
-    sorter: (a, b) => a.createdAt - b.createdAt,
-  },
-  {
-    title: '操作',
-    width: 164,
-    key: 'option',
-    valueType: 'option',
-    render: () => [
-      <a key="1">链路</a>,
-      <a key="2">报警</a>,
-      <a key="3">监控</a>,
-      <a key="4">
-        <EllipsisOutlined />
-      </a>,
-    ],
-  },
-];
-
-const expandedRowRender = () => {
-  const data = [];
-  for (let i = 0; i < 3; i += 1) {
-    data.push({
-      key: i,
-      date: '2014-12-24 23:12:00',
-      name: 'This is production name',
-      upgradeNum: 'Upgraded: 56',
+  const resize = () => {
+    requestAnimationFrame(() => {
+      if (!dom.current) {
+        return;
+      }
+      let mode: 'inline' | 'horizontal' = 'inline';
+      const { offsetWidth } = dom.current;
+      if (dom.current.offsetWidth < 641 && offsetWidth > 400) {
+        mode = 'horizontal';
+      }
+      if (window.innerWidth < 768 && offsetWidth > 400) {
+        mode = 'horizontal';
+      }
+      setInitConfig({ ...initConfig, mode: mode as ConfigState['mode'] });
     });
-  }
-  return (
-    <ProTable
-      columns={[
-        { title: 'Date', dataIndex: 'date', key: 'date' },
-        { title: 'Name', dataIndex: 'name', key: 'name' },
+  };
 
-        { title: 'Upgrade Status', dataIndex: 'upgradeNum', key: 'upgradeNum' },
-        {
-          title: 'Action',
-          dataIndex: 'operation',
-          key: 'operation',
-          valueType: 'option',
-          render: () => [<a key="Pause">Pause</a>, <a key="Stop">Stop</a>],
-        },
-      ]}
-      headerTitle={false}
-      search={false}
-      options={false}
-      dataSource={data}
-      pagination={false}
-    />
+  useLayoutEffect(() => {
+    if (dom.current) {
+      window.addEventListener('resize', resize);
+      resize();
+    }
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
+  }, [dom.current]);
+
+  const getMenu = () => {
+    return Object.keys(menuMap).map((item) => <Item key={item}>{menuMap[item]}</Item>);
+  };
+
+  const renderChildren = () => {
+    const { selectKey } = initConfig;
+    switch (selectKey) {
+      case 'base':
+        return <BaseView />;
+      case 'security':
+        return <SecurityView />;
+      case 'binding':
+        return <BindingView />;
+      case 'notification':
+        return <NotificationView />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <GridContent>
+      <div
+        className={styles.main}
+        ref={(ref) => {
+          if (ref) {
+            dom.current = ref;
+          }
+        }}
+      >
+        <div className={styles.leftMenu}>
+          <Menu
+            mode={initConfig.mode}
+            selectedKeys={[initConfig.selectKey]}
+            onClick={({ key }) => {
+              setInitConfig({
+                ...initConfig,
+                selectKey: key as ConfigStateKeys,
+              });
+            }}
+          >
+            {getMenu()}
+          </Menu>
+        </div>
+        <div className={styles.right}>
+          <div className={styles.title}>{menuMap[initConfig.selectKey]}</div>
+          {renderChildren()}
+        </div>
+      </div>
+    </GridContent>
   );
 };
-
-export default () => {
-  return (
-    <ProTable<TableListItem>
-      columns={columns}
-      request={(params, sorter, filter) => {
-        // 表单搜索项会从 params 传入，传递给后端接口。
-        console.log(params, sorter, filter);
-        return Promise.resolve({
-          data: tableListDataSource,
-          success: true,
-        });
-      }}
-      rowKey="key"
-      pagination={{
-        showQuickJumper: true,
-      }}
-      expandable={{ expandedRowRender }}
-      search={false}
-      dateFormatter="string"
-      headerTitle="嵌套表格"
-      options={false}
-      toolBarRender={() => [
-        <Button key="show">查看日志</Button>,
-        <Button key="out">
-          导出数据
-          <DownOutlined />
-        </Button>,
-        <Button key="primary" type="primary">
-          创建应用
-        </Button>,
-      ]}
-    />
-  );
-};
+export default Config;

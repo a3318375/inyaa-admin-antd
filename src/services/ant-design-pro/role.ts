@@ -29,7 +29,7 @@ export async function delete3(body: API.InyaaSysRole, options?: { [key: string]:
 /** 角色列表 GET /role/list */
 export async function list3(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.list3Params,
+  params?: API.list3Params,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResultListInyaaSysRoleVo>('/role/list', {
@@ -37,7 +37,6 @@ export async function list3(
     params: {
       ...params,
       role: undefined,
-      ...params['role'],
     },
     ...(options || {}),
   });

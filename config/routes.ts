@@ -1,4 +1,4 @@
-﻿export default [
+export default [
   {
     path: '/user',
     layout: false,
@@ -34,8 +34,18 @@
         component: './system/Menu',
       },
       {
-        path: 'config',
+        path: 'account',
+        name: 'account',
+        component: './system/Account',
+      },
+      {
+        path: 'role',
+        name: 'role',
+        component: './system/Role',
+      },
+      {
         name: 'config',
+        path: 'config',
         component: './system/Config',
       },
       {

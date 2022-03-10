@@ -29,7 +29,7 @@ export async function deleteUsingPOST(body: API.InyaaSysUser, options?: { [key: 
 /** 查询用户列表 返回所有用户数据 GET /user/list */
 export async function list(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.listParams,
+  params?: API.listParams,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResultListInyaaSysUserVo>('/user/list', {
@@ -37,7 +37,6 @@ export async function list(
     params: {
       ...params,
       user: undefined,
-      ...params['user'],
     },
     ...(options || {}),
   });
